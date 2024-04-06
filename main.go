@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"sync"
 	"time"
+	// _ "https://github.com/lib/pq"
 )
 
 var (
