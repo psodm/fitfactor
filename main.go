@@ -38,7 +38,14 @@ func main() {
 func run(ctx context.Context, args []string, getenv func(string) string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
-	srv := NewServer()
+
+	db, err := Connect("postgres://postgres:password@localhost:5432/fitfactor?sslmode=disable", 25, 25, 15)
+	if err != nil {
+		return err
+	}
+
+	userStore := UserStore{db: db}
+	srv := NewServer(ctx, &userStore)
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", getenv("HOST"), getenv("PORT")),
 		Handler: srv,

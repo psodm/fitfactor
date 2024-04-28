@@ -1,10 +1,13 @@
 package main
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
-func NewServer() http.Handler {
+func NewServer(ctx context.Context, userStore *UserStore) http.Handler {
 	mux := http.NewServeMux()
-	addRoutes(mux)
+	addRoutes(ctx, mux, userStore)
 	var handler http.Handler = mux
 	return handler
 }
