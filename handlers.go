@@ -34,11 +34,11 @@ func handleLogin(ctx context.Context, userStore *UserStore) http.Handler {
 				}{"invalid username or password"}) // Improve error handling here
 				return
 			}
-			tokenString, err := CreateToken(user.Id.String(), user.Username)
+			tokenString, err := CreateToken(user.Id.String(), user.Username, getenv)
 			if err != nil {
 				encode(w, r, http.StatusInternalServerError, struct {
 					Message string `json:"message"`
-				}{"invalid username or password 2"}) // Improve error handling here
+				}{"failed to create token"}) // Improve error handling here
 				return
 			}
 			encode(w, r, http.StatusOK, struct {
