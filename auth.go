@@ -18,7 +18,7 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func CreateToken(id string, username string) (string, error) {
+func CreateToken(id string, username string, getenv func(string) string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"id":       id,
@@ -33,7 +33,7 @@ func CreateToken(id string, username string) (string, error) {
 }
 
 func VerifyToken(tokenString string, getenv func(string) string) error {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return getenv("SECRET-KEY"), nil
 	})
 	if err != nil {
