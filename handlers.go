@@ -34,7 +34,16 @@ func handleLogin(ctx context.Context, userStore *UserStore) http.Handler {
 				}{"invalid username or password"}) // Improve error handling here
 				return
 			}
-			encode(w, r, http.StatusOK, user) // Update this to issue JWT
+			tokenString, err := CreateToken(user.Id.String(), user.Username)
+			if err != nil {
+				encode(w, r, http.StatusInternalServerError, struct {
+					Message string `json:"message"`
+				}{"invalid username or password 2"}) // Improve error handling here
+				return
+			}
+			encode(w, r, http.StatusOK, struct {
+				Token string `json:"token"`
+			}{tokenString})
 		},
 	)
 }
@@ -80,23 +89,21 @@ func handleCreateUserAccount(ctx context.Context, userStore *UserStore) http.Han
 	}
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Println("1")
 			usr, err := decode[NewUser](r)
 			if err != nil {
 				encode(w, r, http.StatusBadRequest, err) // fix this raw error to return sanirised message
 				return
 			}
-			fmt.Println("2")
 			hash, err := HashPassword(usr.Password)
 			if err != nil {
 				encode(w, r, http.StatusInternalServerError, err) // fix this raw error to return sanitised message
 				return
 			}
-			fmt.Println("3")
 			user := User{Username: usr.Username, Email: usr.Email, Password: hash}
 			if err = userStore.CreateUser(ctx, &user); err != nil {
+				// Fix this for duplicate key error
 				encode(w, r, http.StatusInternalServerError, err) // fix this raw error to return sanitised message
-				// return
+				return
 			}
 			fmt.Printf("username: %s, created: %v\n", user.Username, user.DateCreated)
 			encode(w, r, http.StatusOK, user)

@@ -21,6 +21,8 @@ var (
 			return "127.0.0.1"
 		case "PORT":
 			return "6969"
+		case "SECRET-KEY":
+			return "supersecretkey"
 		default:
 			return ""
 		}
@@ -61,7 +63,6 @@ func run(ctx context.Context, args []string, getenv func(string) string) error {
 	go func() {
 		defer wg.Done()
 		<-ctx.Done()
-		// make a new context for the Shutdown (thanks Alessandro Rosetti)
 		shutdownCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
