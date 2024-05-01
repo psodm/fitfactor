@@ -25,7 +25,7 @@ func CreateToken(id string, username string, getenv func(string) string) (string
 			"username": username,
 			"exp":      time.Now().Add(time.Hour * 24).Unix(),
 		})
-	tokenString, err := token.SignedString(getenv("SECRET-KEY"))
+	tokenString, err := token.SignedString([]byte(getenv("SECRET-KEY")))
 	if err != nil {
 		return "", err
 	}
